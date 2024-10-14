@@ -7,3 +7,10 @@ type Event struct {
 	EventType string
 	CreatedAt time.Time
 }
+
+type EventService interface {
+	Event(id string) (*Event, error)
+	Events() ([]*Event, error)
+	CreateEvent(e *Event) error
+	DeleteEvent(id string) error
+}

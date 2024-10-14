@@ -7,3 +7,10 @@ type Notification struct {
 	EventType string
 	CreatedAt string
 }
+
+type NotificationService interface {
+	Notification(id string) (*Notification, error)
+	Notifications() ([]*Notification, error)
+	CreateNotification(e *Notification) error
+	DeleteEvent(id string) error
+}
