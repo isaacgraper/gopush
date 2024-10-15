@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"github.com/isaacgraper/gopush/event"
 	"github.com/isaacgraper/gopush/notification"
 	"github.com/isaacgraper/gopush/sender"
@@ -22,7 +20,6 @@ func main() {
 		// Modify the struct values by passing new values for it
 		Notification: notification.Notification{
 			Message: "Something",
-			SendAt:  time.Now(),
 		},
 		// Trigger with the given context need to have a condition for triggering this event
 		Trigger: trigger.Trigger{

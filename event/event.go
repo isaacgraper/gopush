@@ -22,4 +22,10 @@ func Run(e *Event) {
 	fmt.Printf("Notification message: %s\n", e.Notification.Message)
 	fmt.Printf("Hold for %.2f\n", e.Sender.Threshold)
 	fmt.Printf("Sending to: %s\n", e.Sender.Endpoint)
+
+	if e.Trigger.Ctx != nil {
+		if _, err := e.Trigger.Ctx(&e.Sender, &e.Notification); err != nil {
+			fmt.Println("Error executing trigger", err)
+		}
+	}
 }
