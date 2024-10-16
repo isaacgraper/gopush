@@ -6,7 +6,10 @@ import (
 	"github.com/isaacgraper/gopush/notification"
 )
 
-
+type Action interface {
+	Set(*Sender) error
+	Send(endpoint string, threshold float64) error 
+}
 
 // endpoint for sending a socket trought
 // threshold for socket waiting
