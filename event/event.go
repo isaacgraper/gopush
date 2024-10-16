@@ -24,7 +24,7 @@ func Run(e *Event) {
 	fmt.Printf("Sending to: %s\n", e.Sender.Endpoint)
 
 	if e.Trigger.Ctx != nil {
-		if _, err := e.Trigger.Ctx(&e.Sender, &e.Notification); err != nil {
+		if _, err := e.Trigger.Ctx(); err != nil {
 			fmt.Println("Error executing trigger", err)
 		}
 	}
