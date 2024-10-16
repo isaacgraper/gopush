@@ -22,6 +22,10 @@ type Trigger struct {
 	Ctx func() (bool, error)
 }
 
+type Context struct {
+	
+}
+
 func (t *Trigger) Execute() error {
 	success, err := t.Ctx()
 	if err != nil {
