@@ -14,7 +14,7 @@ func main() {
 		// Pass the endpoint for the notification been sent to
 		Sender: sender.Sender{
 			Endpoint: "localhost:8080",
-			// Can pass a threshold for multiple events
+			// Can pass a threshold for multiple events handling
 			Threshold: 2,
 		},
 		// Modify the struct values by passing new values for it
@@ -23,13 +23,12 @@ func main() {
 		},
 		// Trigger with the given context need to have a condition for triggering this event
 		Trigger: trigger.Trigger{
-			Ctx: func(sender *sender.Sender, notification *notification.Notification) (bool, error) {
-				// Pass the notification values
-				sender.Send(notification)
+			Ctx: func() (bool, error) {
 				return true, nil
 			},
 		},
-	} // Logic for triggering the event can be set here or in the Ctx above
+	}
+	// Logic for triggering the event can be set here or in the Ctx above
 	event.Run(e)
 
 }

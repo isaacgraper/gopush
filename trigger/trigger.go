@@ -1,11 +1,42 @@
 package trigger
 
 import (
-	"github.com/isaacgraper/gopush/notification"
+	"errors"
+	"time"
+
 	"github.com/isaacgraper/gopush/sender"
 )
 
-// Need to be a bool for trigger the event to send for any occasion and use case
+type Cases interface {
+	// Handle failture cases
+	OnFailure(err error) error
+	// Execute the trigger
+	Execute() error
+	// Validade input data
+	Validate() bool
+	// Set a timeout for the execution
+	Timeout(timeout *sender.Sender) time.Duration
+}
+
 type Trigger struct {
-	Ctx func(sender *sender.Sender, notification *notification.Notification) (bool, error)
+	Ctx func() (bool, error)
+}
+
+func (t *Trigger) Execute() error {
+	success, err := t.Ctx()
+	if err != nil {
+		return t.OnFailure(err)
+	}
+	if !success {
+		return errors.New("trigger did not succeed")
+	}
+	return nil
+}
+
+func (t *Trigger) Validate(data any) bool {
+	return data != nil
+}
+
+func (t *Trigger) OnFailure(err error) error {
+	return errors.New("trigger failed: " + err.Error())
 }
