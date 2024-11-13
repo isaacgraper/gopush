@@ -2,24 +2,28 @@ package sender
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"time"
 
+	"github.com/coder/websocket"
 	"github.com/isaacgraper/gopush/notification"
 )
 
 type Action interface {
 	Set(*Sender) error
-	Send(endpoint string, threshold float64) error 
+	Send(endpoint string, threshold int) error
 }
 
-// endpoint for sending a socket trought
-// threshold for socket waiting
 type Sender struct {
-	Endpoint  string
-	Threshold float64
+	Endpoint  string // Endpoint for sending a socket trought
+	Threshold int    // Threshold for socket waiting
+	// Must be implemented a time to live field
+	// Must be implemented a semaphore condition for requests concurrency
 }
 
-// Modify the valeus for posterior usage
-func (s *Sender) Set(endpoint string, threshold float64) {
+// Set the values for different endpoints and threshold requests
+func (s *Sender) Set(endpoint string, threshold int) {
 	s.Endpoint = endpoint
 	s.Threshold = threshold
 }
@@ -31,6 +35,36 @@ func (s *Sender) Send(message *notification.Notification) bool {
 		fmt.Println("Set not configured with an endpoint")
 		return false
 	}
-	fmt.Printf("Sending \"%s\" to %s\n", message, s.Endpoint)
+	fmt.Printf("Sending: \"%s\" to %s at %s\n", message.Message, s.Endpoint, time.Now().Format("2006/01/02 15:04:05"))
+
+	http.HandleFunc("/", s.wsHandler)
+
+	err := http.ListenAndServe(s.Endpoint, nil)
+	if err != nil {
+		log.Fatal("Failed initializing server")
+	}
+
 	return true
+}
+
+func (s *Sender) wsHandler(w http.ResponseWriter, r *http.Request) {
+	con, err := websocket.Accept(w, r, &websocket.AcceptOptions{
+		InsecureSkipVerify:   true,
+		CompressionThreshold: s.Threshold,
+	})
+	if err != nil {
+		log.Fatal("Failed to accept websocket connection: ", err)
+	}
+
+	defer con.Close(websocket.StatusNormalClosure, "Conexão encerrada")
+
+	_, data, err := con.Read(r.Context())
+	if websocket.CloseStatus(err) == websocket.StatusNormalClosure {
+		log.Println("Client closed connection")
+		return
+	} else if err != nil {
+		log.Println("Error while trying to read data from the client:", err)
+		return
+	}
+	log.Println("Data received from websocket:", string(data))
 }

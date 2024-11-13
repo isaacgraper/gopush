@@ -13,13 +13,13 @@ func main() {
 		Usage: "test",
 		// Pass the endpoint for the notification been sent to
 		Sender: sender.Sender{
-			Endpoint: "localhost:8080",
+			Endpoint: ":8080",
 			// Can pass a threshold for multiple events handling
 			Threshold: 2,
 		},
 		// Modify the struct values by passing new values for it
 		Notification: notification.Notification{
-			Message: "Something",
+			Message: "An event has been triggered and it send a message",
 		},
 		// Trigger with the given context need to have a condition for triggering this event
 		Trigger: trigger.Trigger{
